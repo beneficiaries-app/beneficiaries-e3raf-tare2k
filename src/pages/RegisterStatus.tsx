@@ -8,7 +8,7 @@ interface RegisterStatusProps {
 
 export default function RegisterStatus({ status = RegisterStatusEnum.OPEN }: RegisterStatusProps) {
 
-    const [registerStatus, setRegisterStatus] = useState<RegisterStatusType>(status);
+    const [registerStatus] = useState<RegisterStatusType>(status);
 
     return (
         <>
@@ -29,21 +29,23 @@ export default function RegisterStatus({ status = RegisterStatusEnum.OPEN }: Reg
 
             {/* Competition Date */}
             <div className="text-1xl font-semibold  text-[#06918C] text-center">
+
                 {registerStatus === RegisterStatusEnum.CLOSED && (
-                    <span>
-                        موعدنا يوم السبت الموافق 7 رمضان 1447
+                    <span dangerouslySetInnerHTML={{ __html: import.meta.env.VITE_REGISTER_CLOSED_MSG }}>
                     </span>
                 )}
+
                 {registerStatus === RegisterStatusEnum.PENDING && (
-                    <span>
-                        بداية التسجيل يوم السبت الموافق 7 فبراير 2026
+                    <span dangerouslySetInnerHTML={{ __html: import.meta.env.VITE_REGISTER_PENDING_MSG }}>
                     </span>
                 )}
+
                 {registerStatus === RegisterStatusEnum.OPEN && (
                     <Link to="/register" className="hover:underline cursor-pointer">
                         تسجيل متسابق جديد
                     </Link>
                 )}
+
             </div>
         </>
     )

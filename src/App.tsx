@@ -7,7 +7,7 @@ import { useState } from 'react';
 
 function App() {
 
-    const [registerStatus, setRegisterStatus] = useState<RegisterStatusType>(RegisterStatusEnum.PENDING);
+    const [registerStatus] = useState<RegisterStatusType>(RegisterStatusEnum.PENDING);
 
     return (
         <div className="min-h-screen bg-[#f8f8f8] flex justify-center px-6 py-6">
@@ -23,8 +23,7 @@ function App() {
                     </div>
 
                     {/* Competition Title */}
-                    <h1 className="text-1xl font-bold text-gray-500 text-center mb-6">
-                        مسابقة القرآن الكريم رمضان 1447
+                    <h1 className="text-1xl font-bold text-gray-500 text-center mb-6" dangerouslySetInnerHTML={{ __html: import.meta.env.VITE_REGISTER_HEADER_TITLE }}>
                     </h1>
 
                     <BrowserRouter>
@@ -37,6 +36,7 @@ function App() {
                                     <Route path="*" element={<Navigate to="/pending" replace />} />
                                 </>
                             )}
+
                             {registerStatus === RegisterStatusEnum.OPEN && (
                                 <>
                                     <Route path="/" element={<RegisterForm />} />
@@ -45,6 +45,7 @@ function App() {
                                     <Route path="*" element={<Navigate to="/register" replace />} />
                                 </>
                             )}
+
                             {registerStatus === RegisterStatusEnum.CLOSED && (
                                 <>
                                     <Route path="/" element={<RegisterStatus status={RegisterStatusEnum.CLOSED} />} />
