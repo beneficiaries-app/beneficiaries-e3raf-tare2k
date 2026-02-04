@@ -225,7 +225,7 @@ export default function TermsAndConditionsModal({ isOpen, onClose }: TermsAndCon
                 <div className="p-4 border-t-2 border-[var(--secondary-color)] flex justify-end">
                     <button
                         onClick={onClose}
-                        className="bg-[#06918C] text-white px-8 py-2 rounded-lg hover:bg-[#057a75] transition-colors font-semibold"
+                        className="bg-[#06918C] text-white px-8 py-2 rounded-lg hover:bg-[#057a75] transition-colors font-semibold cursor-pointer"
                     >
                         إغلاق
                     </button>

@@ -42,15 +42,16 @@ export default function RegisterStatus({ status = RegisterStatusEnum.OPEN }: Reg
                         <span dangerouslySetInnerHTML={{ __html: import.meta.env.VITE_REGISTER_PENDING_MSG }}>
                         </span>
 
-                        <br />
-                        <br />
-                        
-                        <button 
-                            onClick={() => setIsTermsModalOpen(true)}
-                            className="text-[var(--secondary-color)] hover:underline cursor-pointer"
-                        >
-                            الشروط والأحكام
-                        </button>
+                        <div className="mt-2 text-gray-700 text-sm">
+                            📌 تُطبق 
+                            <button
+                                onClick={() => setIsTermsModalOpen(true)}
+                                className="text-[var(--secondary-color)] hover:underline cursor-pointer mx-1"
+                            >
+                                الشروط والأحكام
+                            </button> 
+                            الخاصة بالمسابقة.
+                        </div>
                     </>
                 )}
 
@@ -63,9 +64,9 @@ export default function RegisterStatus({ status = RegisterStatusEnum.OPEN }: Reg
             </div>
 
             {/* Terms and Conditions Modal */}
-            <TermsAndConditionsModal 
-                isOpen={isTermsModalOpen} 
-                onClose={() => setIsTermsModalOpen(false)} 
+            <TermsAndConditionsModal
+                isOpen={isTermsModalOpen}
+                onClose={() => setIsTermsModalOpen(false)}
             />
         </>
     )
