@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { Link } from "react-router-dom"
 import { RegisterStatus as RegisterStatusEnum, type RegisterStatusType } from "../enums/register-status.enum";
 
 interface RegisterStatusProps {
@@ -39,9 +40,9 @@ export default function RegisterStatus({ status = RegisterStatusEnum.OPEN }: Reg
                     </span>
                 )}
                 {registerStatus === RegisterStatusEnum.OPEN && (
-                    <span>
+                    <Link to="/register" className="hover:underline cursor-pointer">
                         تسجيل متسابق جديد
-                    </span>
+                    </Link>
                 )}
             </div>
         </>

@@ -1,8 +1,14 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import logo from '../assets/nady-logo.jpg'
 import RegisterStatus from './pages/RegisterStatus'
-import { RegisterStatus as RegisterStatusEnum } from './enums/register-status.enum';
+import RegisterForm from './pages/RegisterForm'
+import { RegisterStatus as RegisterStatusEnum, type RegisterStatusType } from './enums/register-status.enum';
+import { useState } from 'react';
 
 function App() {
+
+    const [registerStatus, setRegisterStatus] = useState<RegisterStatusType>(RegisterStatusEnum.PENDING);
+
     return (
         <div className="min-h-screen bg-[#f8f8f8] flex justify-center px-6 py-6">
             <div className="md:w-[40%] mx-auto">
@@ -21,7 +27,36 @@ function App() {
                         مسابقة القرآن الكريم رمضان 1447
                     </h1>
 
-                    <RegisterStatus status={RegisterStatusEnum.CLOSED} />
+                    <BrowserRouter>
+                        <Routes>
+
+                            {registerStatus === RegisterStatusEnum.PENDING && (
+                                <>
+                                    <Route path="/" element={<RegisterStatus status={RegisterStatusEnum.PENDING} />} />
+                                    <Route path="/pending" element={<RegisterStatus status={RegisterStatusEnum.PENDING} />} />
+                                    <Route path="*" element={<Navigate to="/pending" replace />} />
+                                </>
+                            )}
+                            {registerStatus === RegisterStatusEnum.OPEN && (
+                                <>
+                                    <Route path="/" element={<RegisterForm />} />
+                                    <Route path="/register" element={<RegisterForm />} />
+                                    <Route path="/submission" element={<RegisterStatus status={RegisterStatusEnum.OPEN} />} />
+                                    <Route path="*" element={<Navigate to="/register" replace />} />
+                                </>
+                            )}
+                            {registerStatus === RegisterStatusEnum.CLOSED && (
+                                <>
+                                    <Route path="/" element={<RegisterStatus status={RegisterStatusEnum.CLOSED} />} />
+                                    <Route path="/closed" element={<RegisterStatus status={RegisterStatusEnum.CLOSED} />} />
+                                    <Route path="*" element={<Navigate to="/closed" replace />} />
+                                </>
+                            )}
+
+
+                        </Routes>
+                    </BrowserRouter>
+
                 </div>
             </div>
         </div>
