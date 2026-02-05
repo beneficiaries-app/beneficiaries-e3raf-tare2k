@@ -169,7 +169,7 @@ export default function RegisterForm() {
                                 onClick={() => setIsTermsModalOpen(true)}
                                 className="text-[var(--secondary-color)] hover:underline"
                             >
-                                الشروط والأحكام
+                                الشروط والضوابط
                             </button>
                             {" "}للمسابقة
                         </span>
@@ -178,7 +178,7 @@ export default function RegisterForm() {
 
                 {!acceptedTerms && (
                     <p className="text-sm text-red-600 text-center">
-                        يجب الموافقة على الشروط والأحكام للمتابعة
+                        يجب الموافقة على الشروط والضوابط للمتابعة
                     </p>
                 )}
 

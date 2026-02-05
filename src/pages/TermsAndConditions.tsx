@@ -18,7 +18,7 @@ export default function TermsAndConditionsModal({ isOpen, onClose }: TermsAndCon
                 {/* Modal Header */}
                 <div className="flex justify-between items-center p-4 border-b-2 border-[var(--secondary-color)]">
                     <h2 className="text-2xl font-bold text-[var(--primary-color)]">
-                        الشروط والأحكام
+                        الشروط والضوابط
                     </h2>
                     <button
                         onClick={onClose}
@@ -199,14 +199,14 @@ export default function TermsAndConditionsModal({ isOpen, onClose }: TermsAndCon
 
                     <div className="border-r-4 border-[var(--secondary-color)] p-4 rounded-lg bg-gray-50">
                         <p className="mb-2">
-                            <strong className="text-[var(--secondary-color)]">7.</strong> يحتفظ النادي الثقافي بحق تعديل أو إلغاء أي من الشروط والأحكام 
+                            <strong className="text-[var(--secondary-color)]">7.</strong> يحتفظ النادي الثقافي بحق تعديل أو إلغاء أي من الشروط والضوابط 
                             حسب ما تقتضيه المصلحة العامة للمسابقة.
                         </p>
                     </div>
 
                     <div className="border-r-4 border-[var(--secondary-color)] p-4 rounded-lg bg-gray-50">
                         <p className="mb-2">
-                            <strong className="text-[var(--secondary-color)]">8.</strong> يجب على المتسابق قراءة وفهم جميع الشروط والأحكام قبل إتمام عملية التسجيل.
+                            <strong className="text-[var(--secondary-color)]">8.</strong> يجب على المتسابق قراءة وفهم جميع الشروط والضوابط قبل إتمام عملية التسجيل.
                         </p>
                     </div>
                 </div>

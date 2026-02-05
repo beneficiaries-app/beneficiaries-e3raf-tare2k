@@ -48,7 +48,7 @@ export default function RegisterStatus({ status = RegisterStatusEnum.OPEN }: Reg
                                 onClick={() => setIsTermsModalOpen(true)}
                                 className="text-[var(--secondary-color)] hover:text-[var(--primary-color)] underline cursor-pointer mx-1"
                             >
-                                الشروط والأحكام
+                                الشروط والضوابط
                             </button> 
                             
                         </div>
