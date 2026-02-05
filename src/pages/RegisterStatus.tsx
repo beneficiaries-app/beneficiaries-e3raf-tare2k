@@ -43,14 +43,14 @@ export default function RegisterStatus({ status = RegisterStatusEnum.OPEN }: Reg
                         </span>
 
                         <div className="mt-2 text-gray-700 text-sm">
-                            📌 تُطبق 
+                            📌 تتم المشاركة في مسابقة القرآن الكريم وفق
                             <button
                                 onClick={() => setIsTermsModalOpen(true)}
-                                className="text-[var(--secondary-color)] hover:underline cursor-pointer mx-1"
+                                className="text-[var(--secondary-color)] hover:text-[var(--primary-color)] underline cursor-pointer mx-1"
                             >
                                 الشروط والأحكام
                             </button> 
-                            الخاصة بالمسابقة.
+                            
                         </div>
                     </>
                 )}
