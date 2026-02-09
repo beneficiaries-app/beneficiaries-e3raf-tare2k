@@ -90,7 +90,7 @@ export default function RegisterForm() {
                     <input
                         type="text"
                         className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06918C]"
-                        name="entry.929859737"
+                        name="entry.1435194035"
                         id="name"
                         placeholder="اسم المتسابق رباعي"
                         required
@@ -134,7 +134,7 @@ export default function RegisterForm() {
                     </div>
                     <input
                         type="hidden"
-                        name="entry.1014855338"
+                        name="entry.800027578"
                         id="birthDateHidden"
                     />
                 </div>
@@ -163,7 +163,7 @@ export default function RegisterForm() {
                     <input
                         type="text"
                         className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06918C] focus:border-transparent"
-                        name="entry.800027578"
+                        name="entry.1686949628"
                         id="address"
                         placeholder="العنوان"
                         required
@@ -179,7 +179,7 @@ export default function RegisterForm() {
                     <input
                         type="text"
                         className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06918C] focus:border-transparent"
-                        name="entry.1435194035"
+                        name="entry.929859737"
                         id="mohfez"
                         placeholder="اسم المحفظ"
                         required
@@ -193,7 +193,7 @@ export default function RegisterForm() {
                     </label>
                     <select
                         className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06918C] focus:border-transparent bg-white"
-                        name="entry.1686949628"
+                        name="entry.1014855338"
                         id="level"
                         required
                     >
