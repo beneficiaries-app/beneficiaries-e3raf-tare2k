@@ -1,6 +1,6 @@
 export default function Loader() {
     return (
-        <div className="fixed inset-0 bg-transparent flex items-center justify-center backdrop-blur-sm">
+        <div className="fixed inset-0 bg-transparent flex items-center justify-center backdrop-blur-sm z-9999">
             <div className="flex flex-col items-center">
                 <svg
                     className="animate-spin h-16 w-16 text-[#06918C]"

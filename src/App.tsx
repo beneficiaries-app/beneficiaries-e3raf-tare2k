@@ -7,7 +7,7 @@ import { useState } from 'react';
 
 function App() {
 
-    const [registerStatus] = useState<RegisterStatusType>(RegisterStatusEnum.PENDING);
+    const [registerStatus] = useState<RegisterStatusType>(RegisterStatusEnum.OPEN);
 
     return (
         <div className="min-h-screen bg-[#f8f8f8] flex justify-center px-6 py-6">

@@ -1,22 +1,45 @@
 import { useState, useRef } from "react"
 import { useNavigate } from "react-router-dom"
+import DatePicker, { registerLocale } from "react-datepicker"
+import { ar } from "date-fns/locale/ar"
+import "react-datepicker/dist/react-datepicker.css"
 import TermsAndConditionsModal from "./TermsAndConditions"
 import Loader from "../components/Loader"
+
+registerLocale("ar", ar)
 
 export default function RegisterForm() {
     const [acceptedTerms, setAcceptedTerms] = useState(false)
     const [isTermsModalOpen, setIsTermsModalOpen] = useState(false)
     const [submitted, setSubmitted] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [birthDate, setBirthDate] = useState<Date | null>(null)
     const formRef = useRef<HTMLFormElement>(null)
     const iframeRef = useRef<HTMLIFrameElement>(null)
     const navigate = useNavigate()
+
+    const formatDateToISO = (date: Date | null): string => {
+        if (!date) return ""
+        const year = date.getFullYear()
+        const month = String(date.getMonth() + 1).padStart(2, '0')
+        const day = String(date.getDate()).padStart(2, '0')
+        return `${year}-${month}-${day}`
+    }
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         if (!acceptedTerms || isSubmitting) {
             return
         }
+        
+        // تحويل تاريخ الميلاد إلى الصيغة المطلوبة (YYYY-MM-DD)
+        if (birthDate && formRef.current) {
+            const hiddenDateInput = formRef.current.querySelector('#birthDateHidden') as HTMLInputElement
+            if (hiddenDateInput) {
+                hiddenDateInput.value = formatDateToISO(birthDate)
+            }
+        }
+        
         setIsSubmitting(true)
         setSubmitted(true)
         if (formRef.current) {
@@ -56,6 +79,8 @@ export default function RegisterForm() {
                 target="hiddenConfirm"
                 onSubmit={handleSubmit}
                 className="space-y-4 text-right"
+                lang="ar"
+                dir="rtl"
             >
                 {/* Name Field */}
                 <div>
@@ -72,33 +97,45 @@ export default function RegisterForm() {
                     />
                 </div>
 
-                {/* Age Field */}
+                {/* Date of Birth Field */}
                 <div>
-                    <label htmlFor="age" className="block text-sm font-semibold text-gray-700 mb-2">
-                        العمر <span className="text-red-600">*</span>
+                    <label htmlFor="birthDate" className="block text-sm font-semibold text-gray-700 mb-2">
+                        تاريخ الميلاد <span className="text-red-600">*</span>
                     </label>
+                    <div className="w-full">
+                        <DatePicker
+                            selected={birthDate}
+                            onChange={(date: Date | null) => setBirthDate(date)}
+                            locale="ar"
+                            dateFormat="dd/MM/yyyy"
+                            placeholderText="اختر تاريخ الميلاد"
+                            className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06918C] focus:border-transparent"
+                            wrapperClassName="w-full"
+                            onKeyDown={(e) => {
+                                // منع الكتابة - السماح فقط بمفاتيح التحكم والتنقل
+                                if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && e.key !== 'Tab' && e.key !== 'Enter') {
+                                    e.preventDefault()
+                                }
+                            }}
+                            onChangeRaw={(e) => {
+                                // منع التعديل المباشر في الحقل
+                                if (e) {
+                                    e.preventDefault()
+                                }
+                            }}
+                            required
+                            maxDate={new Date()}
+                            showYearDropdown
+                            showMonthDropdown
+                            dropdownMode="select"
+                            yearDropdownItemNumber={100}
+                            scrollableYearDropdown
+                        />
+                    </div>
                     <input
-                        type="number"
-                        className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06918C] focus:border-transparent"
+                        type="hidden"
                         name="entry.1014855338"
-                        id="age"
-                        placeholder="العمر"
-                        required
-                    />
-                </div>
-
-                {/* Mohfez (Memorization Teacher) Field */}
-                <div>
-                    <label htmlFor="mohfez" className="block text-sm font-semibold text-gray-700 mb-2">
-                        اسم المحفظ <span className="text-red-600">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06918C] focus:border-transparent"
-                        name="entry.1435194035"
-                        id="mohfez"
-                        placeholder="اسم المحفظ"
-                        required
+                        id="birthDateHidden"
                     />
                 </div>
 
@@ -133,6 +170,22 @@ export default function RegisterForm() {
                     />
                 </div>
 
+
+                {/* Mohfez (Memorization Teacher) Field */}
+                <div>
+                    <label htmlFor="mohfez" className="block text-sm font-semibold text-gray-700 mb-2">
+                        اسم المحفظ <span className="text-red-600">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06918C] focus:border-transparent"
+                        name="entry.1435194035"
+                        id="mohfez"
+                        placeholder="اسم المحفظ"
+                        required
+                    />
+                </div>
+                
                 {/* Level Selection */}
                 <div className="level-element">
                     <label htmlFor="level" className="block text-sm font-semibold text-gray-700 mb-2">

@@ -10,3 +10,20 @@ body {
   width: 100%;
   min-height: 100vh;
 }
+
+/* React DatePicker Full Width Styles */
+.react-datepicker-wrapper {
+  width: 100% !important;
+  display: block !important;
+}
+
+.react-datepicker__input-container {
+  width: 100% !important;
+  display: block !important;
+}
+
+.react-datepicker__input-container input {
+  width: 100% !important;
+  cursor: pointer !important;
+  caret-color: transparent !important;
+}
