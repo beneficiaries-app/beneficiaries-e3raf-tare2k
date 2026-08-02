@@ -1,265 +1,177 @@
-import { useState, useRef } from "react"
-import { useNavigate } from "react-router-dom"
-import DatePicker, { registerLocale } from "react-datepicker"
-import { ar } from "date-fns/locale/ar"
-import "react-datepicker/dist/react-datepicker.css"
-import TermsAndConditionsModal from "./TermsAndConditions"
+import { useState, type FormEvent } from "react"
+import { Link, useNavigate } from "react-router-dom"
 import Loader from "../components/Loader"
+import bra3emLogo from "../../assets/bra3em-elhoda.jpeg"
+import nadyLogo from "../../assets/nady-badaway.jpeg"
+import workshopBg from "../../assets/workshop-bg.jpg"
 
-registerLocale("ar", ar)
+const inputClass =
+    "w-full px-4 py-3 bg-white/10 border border-white/15 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[#c4a035] focus:border-transparent"
+
+const labelClass = "block text-sm font-bold text-white/70 mb-2 text-right"
+
+const SCRIPT_URL = import.meta.env.VITE_GOOGLE_SHEETS_SCRIPT_URL as string | undefined
+
+const roles = ["طالب", "ولي أمر", "معلم"] as const
 
 export default function RegisterForm() {
-    const [acceptedTerms, setAcceptedTerms] = useState(false)
-    const [isTermsModalOpen, setIsTermsModalOpen] = useState(false)
-    const [submitted, setSubmitted] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
-    const [birthDate, setBirthDate] = useState<Date | null>(null)
-    const formRef = useRef<HTMLFormElement>(null)
-    const iframeRef = useRef<HTMLIFrameElement>(null)
+    const [error, setError] = useState("")
+    const [role, setRole] = useState("")
     const navigate = useNavigate()
 
-    const formatDateToISO = (date: Date | null): string => {
-        if (!date) return ""
-        const year = date.getFullYear()
-        const month = String(date.getMonth() + 1).padStart(2, '0')
-        const day = String(date.getDate()).padStart(2, '0')
-        return `${year}-${month}-${day}`
-    }
-
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        if (!acceptedTerms || isSubmitting) {
+        if (isSubmitting) return
+
+        if (!SCRIPT_URL) {
+            setError("رابط حفظ البيانات غير مضبوط. أضف VITE_GOOGLE_SHEETS_SCRIPT_URL في ملف .env")
             return
         }
-        
-        // تحويل تاريخ الميلاد إلى الصيغة المطلوبة (YYYY-MM-DD)
-        if (birthDate && formRef.current) {
-            const hiddenDateInput = formRef.current.querySelector('#birthDateHidden') as HTMLInputElement
-            if (hiddenDateInput) {
-                hiddenDateInput.value = formatDateToISO(birthDate)
-            }
-        }
-        
-        setIsSubmitting(true)
-        setSubmitted(true)
-        if (formRef.current) {
-            formRef.current.submit()
-        }
-    }
 
-    const handleIframeLoad = () => {
-        if (submitted && iframeRef.current) {
-            navigate('/submission')
+        if (!role) {
+            setError("من فضلك اختر: طالب أو ولي أمر أو معلم")
+            return
+        }
+
+        const form = e.currentTarget
+        const data = new FormData(form)
+        data.set("role", role)
+
+        setIsSubmitting(true)
+        setError("")
+
+        try {
+            // Google Apps Script يعيد توجيهًا، لذلك نستخدم no-cors
+            await fetch(SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                body: data,
+            })
+            navigate("/submission")
+        } catch {
+            setError("حصل خطأ أثناء التسجيل. حاول مرة أخرى.")
+            setIsSubmitting(false)
         }
     }
 
     return (
-        <div className="space-y-4 relative">
-            {/* Full Page Loader Overlay */}
-            {isSubmitting && (
-                <Loader />
-            )}
+        <div className="relative min-h-svh text-white" dir="rtl" lang="ar">
+            {isSubmitting && <Loader />}
 
-            {/* Separator Line */}
-            <hr className="border-t border-gray-300 w-[95%] max-w mx-auto my-4" />
-
-            {/* Hidden iframe for form submission */}
-            <iframe
-                ref={iframeRef}
-                name="hiddenConfirm"
-                id="hiddenConfirm"
-                style={{ display: 'none' }}
-                onLoad={handleIframeLoad}
+            <div
+                className="event-parallax-bg absolute inset-0"
+                style={{ backgroundImage: `url(${workshopBg})` }}
+                aria-hidden
             />
+            <div className="absolute inset-0 bg-black/85" />
 
-            <form
-                ref={formRef}
-                action="https://docs.google.com/forms/d/e/1FAIpQLSfsRYlAKSzSQIv0tcXNTOr6p76J3D8IY4ofLY2CP2tirlEpSg/formResponse"
-                method="post"
-                target="hiddenConfirm"
-                onSubmit={handleSubmit}
-                className="space-y-4 text-right"
-                lang="ar"
-                dir="rtl"
-            >
-                {/* Name Field */}
-                <div>
-                    <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
-                        اسم المتسابق <span className="text-red-600">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06918C]"
-                        name="entry.1435194035"
-                        id="name"
-                        placeholder="اسم المتسابق رباعي"
-                        required
-                    />
+            <div className="relative z-10 max-w-md mx-auto px-6 py-10">
+                <div className="text-center mb-8">
+                    <div className="flex items-center justify-center gap-5 mb-5">
+                        <div className="org-logo-frame" style={{ width: 88, height: 88 }}>
+                            <img src={bra3emLogo} alt="براعم الهدى" />
+                        </div>
+                        <span className="text-[#c4a035] text-xl font-black">×</span>
+                        <div className="org-logo-frame" style={{ width: 88, height: 88, animationDelay: "0.7s, 0.7s" }}>
+                            <img src={nadyLogo} alt="نادي شبان بدواي" />
+                        </div>
+                    </div>
+
+                    <h1 className="text-3xl md:text-4xl font-black mb-2">اعرف طريقك</h1>
+                    <p className="text-[#c4a035] text-sm font-bold tracking-[0.15em] mb-4">
+                        تسجيل الحضور
+                    </p>
+                    <Link
+                        to="/"
+                        className="inline-block text-sm text-white/60 hover:text-[#c4a035] transition-colors"
+                    >
+                        ← العودة للصفحة الرئيسية
+                    </Link>
                 </div>
 
-                {/* Date of Birth Field */}
-                <div>
-                    <label htmlFor="birthDate" className="block text-sm font-semibold text-gray-700 mb-2">
-                        تاريخ الميلاد <span className="text-red-600">*</span>
-                    </label>
-                    <div className="w-full">
-                        <DatePicker
-                            selected={birthDate}
-                            onChange={(date: Date | null) => setBirthDate(date)}
-                            locale="ar"
-                            dateFormat="dd/MM/yyyy"
-                            placeholderText="اختر تاريخ الميلاد"
-                            className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06918C] focus:border-transparent"
-                            wrapperClassName="w-full"
-                            onKeyDown={(e) => {
-                                // منع الكتابة - السماح فقط بمفاتيح التحكم والتنقل
-                                if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && e.key !== 'Tab' && e.key !== 'Enter') {
-                                    e.preventDefault()
-                                }
-                            }}
-                            onChangeRaw={(e) => {
-                                // منع التعديل المباشر في الحقل
-                                if (e) {
-                                    e.preventDefault()
-                                }
-                            }}
+                <form onSubmit={handleSubmit} className="space-y-5">
+                    <div>
+                        <label htmlFor="name" className={labelClass}>
+                            الاسم <span className="text-[#c4a035]">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            className={inputClass}
+                            name="name"
+                            id="name"
+                            placeholder="الاسم بالكامل"
                             required
-                            maxDate={new Date()}
-                            showYearDropdown
-                            showMonthDropdown
-                            dropdownMode="select"
-                            yearDropdownItemNumber={100}
-                            scrollableYearDropdown
                         />
                     </div>
-                    <input
-                        type="hidden"
-                        name="entry.800027578"
-                        id="birthDateHidden"
-                    />
-                </div>
 
-                {/* Phone Field */}
-                <div>
-                    <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-2">
-                        رقم الهاتف <span className="text-red-600">*</span>
-                    </label>
-                    <input
-                        type="number"
-                        className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06918C] focus:border-transparent"
-                        name="entry.1943207684"
-                        id="phone"
-                        placeholder="0123456789"
-                        min="10"
-                        required
-                    />
-                </div>
+                    <div>
+                        <p className={labelClass}>
+                            الفئة <span className="text-[#c4a035]">*</span>
+                        </p>
+                        <div className="grid grid-cols-3 gap-2">
+                            {roles.map((item) => {
+                                const selected = role === item
+                                return (
+                                    <button
+                                        key={item}
+                                        type="button"
+                                        onClick={() => {
+                                            setRole(item)
+                                            setError("")
+                                        }}
+                                        className={`py-3 px-2 text-sm font-bold transition-colors border ${
+                                            selected
+                                                ? "bg-[#1a6b4a] border-[#1a6b4a] text-white"
+                                                : "bg-white/5 border-white/15 text-white/80 hover:border-[#c4a035]/60 hover:text-white"
+                                        }`}
+                                    >
+                                        {item}
+                                    </button>
+                                )
+                            })}
+                        </div>
+                    </div>
 
-                {/* Address Field */}
-                <div>
-                    <label htmlFor="address" className="block text-sm font-semibold text-gray-700 mb-2">
-                        العنوان <span className="text-red-600">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06918C] focus:border-transparent"
-                        name="entry.1686949628"
-                        id="address"
-                        placeholder="العنوان"
-                        required
-                    />
-                </div>
-
-
-                {/* Mohfez (Memorization Teacher) Field */}
-                <div>
-                    <label htmlFor="mohfez" className="block text-sm font-semibold text-gray-700 mb-2">
-                        اسم المحفظ <span className="text-red-600">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06918C] focus:border-transparent"
-                        name="entry.929859737"
-                        id="mohfez"
-                        placeholder="اسم المحفظ"
-                        required
-                    />
-                </div>
-                
-                {/* Level Selection */}
-                <div className="level-element">
-                    <label htmlFor="level" className="block text-sm font-semibold text-gray-700 mb-2">
-                        اختر المستوى <span className="text-red-600">*</span>
-                    </label>
-                    <select
-                        className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06918C] focus:border-transparent bg-white"
-                        name="entry.1014855338"
-                        id="level"
-                        required
-                    >
-                        <option value="القرآن الكريم كاملاً بالقراءات">1- حفظ القرآن الكريم كاملاً بالقراءات</option>
-                        <option value="القرآن الكريم كاملاً مجوداً مع الصوت الحسن">2- حفظ القرآن الكريم كاملاً مجوداً مع الصوت الحسن</option>
-                        <option value="القرآن الكريم كاملاً">3- حفظ القرآن الكريم كاملاً</option>
-
-                        <option value="ثلاثة أرباع القرآن الكريم">4- حفظ ثلاثة أرباع القرآن الكريم</option>
-                        <option value="نصف القرآن الكريم">5- حفظ نصف القرآن الكريم</option>
-                        <option value="ربع القرآن الكريم">6- حفظ ربع القرآن الكريم</option>
-
-                        <option value="خمسة أجزاء من القرآن الكريم">7- حفظ خمسة أجزاء من القرآن الكريم</option>
-                        <option value="سورة الكهف وتفسيرها">8- حفظ سورة الكهف وتفسيرها</option>
-                    </select>
-                </div>
-
-                {/* Terms and Conditions Checkbox */}
-                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                    <label className="flex items-start gap-3 cursor-pointer">
-                        <input
-                            type="checkbox"
-                            checked={acceptedTerms}
-                            onChange={(e) => setAcceptedTerms(e.target.checked)}
-                            className="w-5 h-5 text-[var(--primary-color)] border-gray-300 rounded focus:ring-[#06918C]"
+                    <div>
+                        <label htmlFor="expectation" className={labelClass}>
+                            متوقع إيه من المبادرة؟ <span className="text-[#c4a035]">*</span>
+                        </label>
+                        <textarea
+                            className={`${inputClass} resize-none`}
+                            name="expectation"
+                            id="expectation"
+                            placeholder="اكتب توقعاتك من المبادرة"
+                            rows={4}
                             required
                         />
-                        <span className="text-sm text-gray-700 flex-1 font-semibold">
-                            أوافق على{" "}
-                            <button
-                                type="button"
-                                onClick={() => setIsTermsModalOpen(true)}
-                                className="text-[var(--secondary-color)] hover:underline"
-                            >
-                                الشروط والضوابط
-                            </button>
-                            {" "}للمسابقة
-                        </span>
-                    </label>
-                </div>
+                    </div>
 
-                {!acceptedTerms && (
-                    <p className="text-sm text-red-600 text-center">
-                        يجب الموافقة على الشروط والضوابط للمتابعة
-                    </p>
-                )}
+                    {error && (
+                        <p className="text-center text-red-300 text-sm leading-relaxed bg-red-500/10 px-3 py-2">
+                            {error}
+                        </p>
+                    )}
 
-                {/* Submit Button */}
-                <div className="text-center pt-2">
-                    <button
-                        type="submit"
-                        disabled={!acceptedTerms || isSubmitting}
-                        className={`px-10 py-3 rounded-lg font-semibold transition-colors ${acceptedTerms && !isSubmitting
-                                ? "bg-[#06918C] text-white hover:bg-[#057a75] cursor-pointer"
-                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    <div className="text-center pt-4">
+                        <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className={`inline-flex items-center justify-center gap-2 px-12 py-3.5 font-bold text-lg transition-colors ${
+                                !isSubmitting
+                                    ? "bg-[#1a6b4a] text-white hover:bg-[#145539] cursor-pointer cta-pulse"
+                                    : "bg-white/20 text-white/40 cursor-not-allowed"
                             }`}
-                    >
-                        تسجيل
-                    </button>
-                </div>
-            </form>
+                        >
+                            تأكيد التسجيل
+                        </button>
+                    </div>
+                </form>
 
-            {/* Terms and Conditions Modal */}
-            <TermsAndConditionsModal
-                isOpen={isTermsModalOpen}
-                onClose={() => setIsTermsModalOpen(false)}
-            />
+                <p className="text-center text-white/35 text-sm mt-10">
+                    الجمعة · 8 أغسطس 2026 · الساعة 6 مساءً · نادي شبان بدواي
+                </p>
+            </div>
         </div>
     )
 }

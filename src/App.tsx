@@ -1,65 +1,50 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import logo from '../assets/nady-logo.jpg'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import RegisterStatus from './pages/RegisterStatus'
 import RegisterForm from './pages/RegisterForm'
-import { RegisterStatus as RegisterStatusEnum, type RegisterStatusType } from './enums/register-status.enum';
-import { useState } from 'react';
+import HomePage from './pages/HomePage'
+import { RegisterStatus as RegisterStatusEnum, type RegisterStatusType } from './enums/register-status.enum'
+import { useState } from 'react'
 
-function App() {
+function OpenRoutes() {
+    const location = useLocation()
+    const isHome = location.pathname === '/'
 
-    const [registerStatus] = useState<RegisterStatusType>(RegisterStatusEnum.OPEN);
+    if (isHome) {
+        return <HomePage />
+    }
 
     return (
-        <div className="min-h-screen bg-[#f8f8f8] flex justify-center px-6 py-6">
-            <div className="md:w-[40%] mx-auto">
-                <div className="bg-white rounded-lg border border-gray-200 px-4 py-10 text-center mx-auto">
-                    {/* Logo */}
-                    <div className="mb-3 flex justify-center">
-                        <img
-                            src={logo}
-                            alt="شعار النادي"
-                            className="max-w-[150px] h-auto object-contain"
-                        />
-                    </div>
+        <Routes>
+            <Route path="/register" element={<RegisterForm />} />
+            <Route path="/submission" element={<RegisterStatus status={RegisterStatusEnum.OPEN} />} />
+            <Route path="*" element={<Navigate to="/register" replace />} />
+        </Routes>
+    )
+}
 
-                    {/* Competition Title */}
-                    <h1 className="text-1xl font-bold text-gray-500 text-center mb-6" dangerouslySetInnerHTML={{ __html: import.meta.env.VITE_REGISTER_HEADER_TITLE }}>
-                    </h1>
+function App() {
+    const [registerStatus] = useState<RegisterStatusType>(RegisterStatusEnum.OPEN)
 
-                    <BrowserRouter>
-                        <Routes>
+    return (
+        <BrowserRouter>
+            {registerStatus === RegisterStatusEnum.PENDING && (
+                <Routes>
+                    <Route path="/" element={<RegisterStatus status={RegisterStatusEnum.PENDING} />} />
+                    <Route path="/pending" element={<RegisterStatus status={RegisterStatusEnum.PENDING} />} />
+                    <Route path="*" element={<Navigate to="/pending" replace />} />
+                </Routes>
+            )}
 
-                            {registerStatus === RegisterStatusEnum.PENDING && (
-                                <>
-                                    <Route path="/" element={<RegisterStatus status={RegisterStatusEnum.PENDING} />} />
-                                    <Route path="/pending" element={<RegisterStatus status={RegisterStatusEnum.PENDING} />} />
-                                    <Route path="*" element={<Navigate to="/pending" replace />} />
-                                </>
-                            )}
+            {registerStatus === RegisterStatusEnum.OPEN && <OpenRoutes />}
 
-                            {registerStatus === RegisterStatusEnum.OPEN && (
-                                <>
-                                    <Route path="/" element={<RegisterForm />} />
-                                    <Route path="/register" element={<RegisterForm />} />
-                                    <Route path="/submission" element={<RegisterStatus status={RegisterStatusEnum.OPEN} />} />
-                                    <Route path="*" element={<Navigate to="/register" replace />} />
-                                </>
-                            )}
-
-                            {registerStatus === RegisterStatusEnum.CLOSED && (
-                                <>
-                                    <Route path="/" element={<RegisterStatus status={RegisterStatusEnum.CLOSED} />} />
-                                    <Route path="/closed" element={<RegisterStatus status={RegisterStatusEnum.CLOSED} />} />
-                                    <Route path="*" element={<Navigate to="/closed" replace />} />
-                                </>
-                            )}
-
-                        </Routes>
-                    </BrowserRouter>
-
-                </div>
-            </div>
-        </div>
+            {registerStatus === RegisterStatusEnum.CLOSED && (
+                <Routes>
+                    <Route path="/" element={<RegisterStatus status={RegisterStatusEnum.CLOSED} />} />
+                    <Route path="/closed" element={<RegisterStatus status={RegisterStatusEnum.CLOSED} />} />
+                    <Route path="*" element={<Navigate to="/closed" replace />} />
+                </Routes>
+            )}
+        </BrowserRouter>
     )
 }
 

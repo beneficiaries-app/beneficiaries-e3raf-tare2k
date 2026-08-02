@@ -57,14 +57,264 @@
 }
 
 :root {
-    --primary-color: #06918C !important;
-    --secondary-color: #D2B067 !important;
+    --primary-color: #1a6b4a;
+    --secondary-color: #c4a035;
+    --ink: #1a2332;
+    --ink-soft: #5a6578;
+    --paper: #faf8f4;
+    --gold: #c4a035;
+    --green: #1a6b4a;
 }
 
 * {
-    font-family: 'Tajawal', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    font-family: 'Tajawal', sans-serif;
 }
 
 body {
-    font-family: 'Tajawal', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    font-family: 'Tajawal', sans-serif;
+    color: var(--ink);
+    background: var(--paper);
 }
+
+@keyframes fade-up {
+    from {
+        opacity: 0;
+        transform: translateY(28px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes soft-rise {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes path-draw {
+    from {
+        stroke-dashoffset: 400;
+    }
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes logo-float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+@keyframes logo-ring-pulse {
+    0%, 100% {
+        box-shadow:
+            0 0 0 0 rgba(196, 160, 53, 0.35),
+            0 8px 24px rgba(26, 35, 50, 0.08);
+    }
+    50% {
+        box-shadow:
+            0 0 0 8px rgba(196, 160, 53, 0),
+            0 10px 28px rgba(26, 35, 50, 0.12);
+    }
+}
+
+@keyframes icon-bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+@keyframes cta-glow {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(26, 107, 74, 0.35);
+    }
+    50% {
+        box-shadow: 0 0 0 10px rgba(26, 107, 74, 0);
+    }
+}
+
+@keyframes reveal-up {
+    from {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-up {
+    animation: fade-up 0.9s ease-out both;
+}
+
+.animate-fade-up-delay-1 {
+    animation: fade-up 0.9s ease-out 0.15s both;
+}
+
+.animate-fade-up-delay-2 {
+    animation: fade-up 0.9s ease-out 0.3s both;
+}
+
+.animate-fade-up-delay-3 {
+    animation: fade-up 0.9s ease-out 0.45s both;
+}
+
+.animate-soft-rise {
+    animation: soft-rise 1s ease-out both;
+}
+
+.hero-path {
+    stroke-dasharray: 400;
+    animation: path-draw 2.2s ease-out 0.4s both;
+}
+
+.cta-pulse {
+    animation: cta-glow 2.4s ease-in-out infinite;
+}
+
+.icon-soft-bob {
+    animation: icon-bob 2.8s ease-in-out infinite;
+}
+
+.reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+        opacity 0.7s ease,
+        transform 0.7s ease;
+}
+
+.reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.reveal-delay-1 { transition-delay: 0.08s; }
+.reveal-delay-2 { transition-delay: 0.16s; }
+.reveal-delay-3 { transition-delay: 0.24s; }
+.reveal-delay-4 { transition-delay: 0.32s; }
+
+.section-wave {
+    display: block;
+    width: 100%;
+    height: 48px;
+    margin-top: -1px;
+}
+
+@keyframes ken-burns {
+    0% { transform: scale(1) translate(0, 0); }
+    100% { transform: scale(1.08) translate(-1%, -1%); }
+}
+
+@keyframes orb-float {
+    0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.35; }
+    50% { transform: translate(12px, -18px) scale(1.12); opacity: 0.55; }
+}
+
+.hero-ken {
+    animation: ken-burns 18s ease-in-out infinite alternate;
+    will-change: transform;
+}
+
+.pain-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(40px);
+    pointer-events: none;
+    animation: orb-float 7s ease-in-out infinite;
+}
+
+.pain-orb-1 {
+    width: 180px;
+    height: 180px;
+    background: #c4a035;
+    top: 10%;
+    right: -40px;
+    opacity: 0.25;
+}
+
+.pain-orb-2 {
+    width: 140px;
+    height: 140px;
+    background: #1a6b4a;
+    bottom: 15%;
+    left: -30px;
+    opacity: 0.3;
+    animation-delay: 1.4s;
+    animation-duration: 9s;
+}
+
+.pain-orb-3 {
+    width: 100px;
+    height: 100px;
+    background: #c4a035;
+    top: 55%;
+    right: 20%;
+    opacity: 0.2;
+    animation-delay: 2.2s;
+    animation-duration: 8s;
+}
+
+
+.org-logo-frame {
+    width: 128px;
+    height: 128px;
+    padding: 6px;
+    border-radius: 50%;
+    background:
+        linear-gradient(#faf8f4, #faf8f4) padding-box,
+        linear-gradient(145deg, #c4a035, #1a6b4a, #c4a035) border-box;
+    border: 3px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    animation:
+        logo-float 3.5s ease-in-out infinite,
+        logo-ring-pulse 3.5s ease-in-out infinite;
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.org-logo-frame:nth-of-type(2),
+.org-logo-wrap:nth-child(3) .org-logo-frame {
+    animation-delay: 0.6s, 0.6s;
+}
+
+.org-logo-frame:hover {
+    transform: translateY(-4px) scale(1.05);
+    animation-play-state: paused;
+}
+
+.org-logo-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+/* Parallax: image stays fixed while page scrolls over it */
+.event-parallax-bg {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+@supports (-webkit-touch-callout: none) {
+    /* iOS Safari: fixed attachment is unreliable */
+    .event-parallax-bg {
+        background-attachment: scroll;
+    }
+}
+

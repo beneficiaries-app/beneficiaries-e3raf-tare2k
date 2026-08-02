@@ -3,7 +3,7 @@ export default function Loader() {
         <div className="fixed inset-0 bg-transparent flex items-center justify-center backdrop-blur-sm z-9999">
             <div className="flex flex-col items-center">
                 <svg
-                    className="animate-spin h-16 w-16 text-[#06918C]"
+                    className="animate-spin h-16 w-16 text-[#1a6b4a]"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
