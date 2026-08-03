@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-route
 import RegisterStatus from './pages/RegisterStatus'
 import RegisterForm from './pages/RegisterForm'
 import HomePage from './pages/HomePage'
+import AdminDashboard from './pages/AdminDashboard'
 import { RegisterStatus as RegisterStatusEnum, type RegisterStatusType } from './enums/register-status.enum'
 import { useState } from 'react'
 
@@ -22,28 +23,40 @@ function OpenRoutes() {
     )
 }
 
+function PublicGate({ registerStatus }: { registerStatus: RegisterStatusType }) {
+    if (registerStatus === RegisterStatusEnum.PENDING) {
+        return (
+            <Routes>
+                <Route path="/" element={<RegisterStatus status={RegisterStatusEnum.PENDING} />} />
+                <Route path="/pending" element={<RegisterStatus status={RegisterStatusEnum.PENDING} />} />
+                <Route path="*" element={<Navigate to="/pending" replace />} />
+            </Routes>
+        )
+    }
+
+    if (registerStatus === RegisterStatusEnum.CLOSED) {
+        return (
+            <Routes>
+                <Route path="/" element={<RegisterStatus status={RegisterStatusEnum.CLOSED} />} />
+                <Route path="/closed" element={<RegisterStatus status={RegisterStatusEnum.CLOSED} />} />
+                <Route path="*" element={<Navigate to="/closed" replace />} />
+            </Routes>
+        )
+    }
+
+    return <OpenRoutes />
+}
+
 function App() {
     const [registerStatus] = useState<RegisterStatusType>(RegisterStatusEnum.OPEN)
 
     return (
         <BrowserRouter>
-            {registerStatus === RegisterStatusEnum.PENDING && (
-                <Routes>
-                    <Route path="/" element={<RegisterStatus status={RegisterStatusEnum.PENDING} />} />
-                    <Route path="/pending" element={<RegisterStatus status={RegisterStatusEnum.PENDING} />} />
-                    <Route path="*" element={<Navigate to="/pending" replace />} />
-                </Routes>
-            )}
-
-            {registerStatus === RegisterStatusEnum.OPEN && <OpenRoutes />}
-
-            {registerStatus === RegisterStatusEnum.CLOSED && (
-                <Routes>
-                    <Route path="/" element={<RegisterStatus status={RegisterStatusEnum.CLOSED} />} />
-                    <Route path="/closed" element={<RegisterStatus status={RegisterStatusEnum.CLOSED} />} />
-                    <Route path="*" element={<Navigate to="/closed" replace />} />
-                </Routes>
-            )}
+            <Routes>
+                {/* مستقلة تمامًا — مش مربوطة بأي لينك في الموقع */}
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/*" element={<PublicGate registerStatus={registerStatus} />} />
+            </Routes>
         </BrowserRouter>
     )
 }

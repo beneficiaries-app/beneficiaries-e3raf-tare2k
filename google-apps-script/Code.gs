@@ -1,5 +1,5 @@
 /**
- * اعرف طريقك — حفظ التسجيلات في Google Sheets
+ * اعرف طريقك — حفظ وقراءة التسجيلات من Google Sheets
  *
  * =========================
  * اعمل الخطوات دي بالظبط:
@@ -9,15 +9,22 @@
  *    https://docs.google.com/spreadsheets/d/XXXX/edit
  *    XXXX = SPREADSHEET_ID
  * 3) حطه تحت في SPREADSHEET_ID
- * 4) احفظ الملف
- * 5) من فوق: Run → اختار testConnection → Run
+ * 4) غيّر ADMIN_LIST_KEY لمفتاح سري (نفسه اللي هتدخله في صفحة الأدمن)
+ * 5) احفظ الملف
+ * 6) من فوق: Run → اختار testConnection → Run
  *    لو نجح هتلاقي سطر تجريبي في تاب "التسجيلات"
- * 6) Deploy → Manage deployments → قلم Edit
+ * 7) Deploy → Manage deployments → قلم Edit
  *    → Version: New version → Deploy
+ *
+ * قراءة التسجيلات (للداشبورد):
+ *   GET ?action=list&key=ADMIN_LIST_KEY
  */
 
 // ←←← حط ID الشيت هنا (مهم جدًا)
 var SPREADSHEET_ID = '1V7qyTDFW3vYptTZ6NPetPtM531RhdKXkpqLi0ZEf0T0';
+
+// ←←← مفتاح سري لصفحة الأدمن (غيّره قبل الـ Deploy)
+var ADMIN_LIST_KEY = 'nadwa-admin-2026';
 
 var SHEET_NAME = 'التسجيلات';
 var HEADERS = ['الوقت', 'الاسم', 'الفئة', 'متوقع من المبادرة'];
@@ -43,8 +50,14 @@ function doPost(e) {
   }
 }
 
-function doGet() {
+function doGet(e) {
   try {
+    var action = e && e.parameter && e.parameter.action ? String(e.parameter.action) : '';
+
+    if (action === 'list') {
+      return listRegistrations_(e);
+    }
+
     getOrCreateSheet_();
     return ContentService
       .createTextOutput('جاهز ✅ — الشيت متصل. جرّب التسجيل من الموقع.')
@@ -54,6 +67,52 @@ function doGet() {
       .createTextOutput('خطأ ❌: ' + String(err))
       .setMimeType(ContentService.MimeType.TEXT);
   }
+}
+
+function listRegistrations_(e) {
+  var key = e && e.parameter && e.parameter.key ? String(e.parameter.key) : '';
+  if (!ADMIN_LIST_KEY || key !== ADMIN_LIST_KEY) {
+    return json_({ ok: false, error: 'unauthorized' });
+  }
+
+  var sheet = getOrCreateSheet_();
+  ensureHeaders_(sheet);
+
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) {
+    return json_({ ok: true, count: 0, registrations: [] });
+  }
+
+  var values = sheet.getRange(2, 1, lastRow, HEADERS.length).getValues();
+  var registrations = [];
+
+  for (var i = 0; i < values.length; i++) {
+    var row = values[i];
+    var name = String(row[1] || '').trim();
+    var role = String(row[2] || '').trim();
+    var expectation = String(row[3] || '').trim();
+
+    // تجاهل الصفوف الفاضية
+    if (!name && !role && !expectation) continue;
+
+    var ts = row[0];
+    var timestamp = '';
+    if (ts instanceof Date) {
+      timestamp = ts.toISOString();
+    } else if (ts) {
+      timestamp = String(ts);
+    }
+
+    registrations.push({
+      id: i + 1,
+      timestamp: timestamp,
+      name: name,
+      role: role,
+      expectation: expectation,
+    });
+  }
+
+  return json_({ ok: true, count: registrations.length, registrations: registrations });
 }
 
 /** شغّل الدالة دي يدويًا من Apps Script للتأكد */
