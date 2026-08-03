@@ -38,7 +38,7 @@ export default function RegisterStatus({ status = RegisterStatusEnum.OPEN }: Reg
                     <>
                         <p className="text-xl font-bold text-red-400 mb-4">تم إغلاق التسجيل</p>
                         <p className="text-white/70 leading-relaxed mb-2">
-                            شكرًا لاهتمامك بورشة اعرف طريقك
+                            شكرًا لاهتمامك بمبادرة اعرف طريقك
                         </p>
                         <p className="text-white/50 text-sm">
                             الجمعة · 8 أغسطس 2026 · الساعة 6 مساءً · نادي شبان بدواي

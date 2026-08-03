@@ -3,6 +3,7 @@ import bra3emLogo from "../../assets/bra3em-elhoda.jpeg"
 import nadyLogo from "../../assets/nady-badaway.jpeg"
 import workshopBg from "../../assets/workshop-bg.jpg"
 import heroBg from "../../assets/hero-bg.jpg"
+import speakersBg from "../../assets/speakers-bg.jpg"
 import { useEffect, useRef, type ReactNode, type SVGProps } from "react"
 
 const painPoints = [
@@ -17,6 +18,23 @@ const outcomes = [
     { text: "تعرف الكلية اللي تناسب رغبتك وقدراتك.", Icon: IconGraduation },
     { text: "تتعلم مهارات هتفيدك في الجامعة وسوق العمل.", Icon: IconSkills },
     { text: "تفهم نظام البكالوريا الجديد بوضوح.", Icon: IconBook },
+]
+
+const speakers = [
+    {
+        num: "٠١",
+        label: "المحاضرة الأولى",
+        topic: "اعرف طريقك",
+        title: "المهندس",
+        name: "إسلام السيد هيكل",
+    },
+    {
+        num: "٠٢",
+        label: "المحاضرة الثانية",
+        topic: "نظام البكالوريا الثانوية العامة",
+        title: "الدكتور",
+        name: "رضا عبدالعزيز شمس الدين",
+    },
 ]
 
 function IconBase({ children, ...props }: SVGProps<SVGSVGElement> & { children: ReactNode }) {
@@ -169,11 +187,42 @@ function IconAward(props: SVGProps<SVGSVGElement>) {
     )
 }
 
+function IconMic(props: SVGProps<SVGSVGElement>) {
+    return (
+        <IconBase {...props}>
+            <path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" />
+            <path d="M19 10v1a7 7 0 0 1-14 0v-1" />
+            <line x1="12" y1="18" x2="12" y2="22" />
+            <line x1="8" y1="22" x2="16" y2="22" />
+        </IconBase>
+    )
+}
+
 function IconCheck(props: SVGProps<SVGSVGElement>) {
     return (
         <IconBase {...props}>
             <path d="M20 6 9 17l-5-5" />
         </IconBase>
+    )
+}
+
+function SectionTitle({
+    children,
+    className = "text-[#1a2332]",
+    wrapClassName = "mb-10",
+}: {
+    children: ReactNode
+    className?: string
+    wrapClassName?: string
+}) {
+    return (
+        <div className={`title-with-lines ${wrapClassName}`}>
+            <span className="title-line" aria-hidden />
+            <h2 className={`text-2xl md:text-3xl font-black text-center ${className}`}>
+                {children}
+            </h2>
+            <span className="title-line" aria-hidden />
+        </div>
     )
 }
 
@@ -281,9 +330,7 @@ export default function HomePage() {
             <section className="px-6 py-10 md:py-20">
                 <div className="max-w-sm mx-auto">
                     <Reveal>
-                        <h2 className="text-2xl md:text-3xl font-black text-[#1a2332] mb-10 text-center">
-                            هتخرج بإيه؟
-                        </h2>
+                        <SectionTitle>هتخرج بإيه؟</SectionTitle>
                     </Reveal>
 
                     <ul className="space-y-8">
@@ -305,6 +352,58 @@ export default function HomePage() {
                 </div>
             </section>
 
+            {/* ===== SPEAKERS ===== */}
+            <section className="speaker-section relative px-6 py-16 md:py-24 overflow-hidden">
+                <div
+                    className="event-parallax-bg absolute inset-0"
+                    style={{ backgroundImage: `url(${speakersBg})` }}
+                    aria-hidden
+                />
+                <div className="speaker-overlay" aria-hidden />
+
+                <div className="relative z-10 max-w-lg mx-auto">
+                    <Reveal>
+                        <SectionTitle className="text-white" wrapClassName="mb-10">
+                            برنامج اليوم
+                        </SectionTitle>
+                    </Reveal>
+
+                    {speakers.map(({ num, label, topic, title, name }, i) => (
+                        <div key={name}>
+                            {i > 0 && (
+                                <Reveal delay={2}>
+                                    <div className="speaker-bridge" aria-hidden>
+                                        <span className="speaker-bridge-line" />
+                                        <span className="speaker-bridge-diamond" />
+                                        <span className="speaker-bridge-line" />
+                                    </div>
+                                </Reveal>
+                            )}
+
+                            <Reveal delay={i + 1}>
+                                <article className={`speaker-act speaker-act-${i + 1}`}>
+                                    <div className="speaker-act-top">
+                                        <span className="speaker-num">{num}</span>
+                                        <span className="speaker-label">{label}</span>
+                                    </div>
+
+                                    <h3 className="speaker-topic">{topic}</h3>
+                                    <span className="speaker-underline" aria-hidden />
+
+                                    <div className="speaker-byline">
+                                        <IconMic className="speaker-mic" />
+                                        <div>
+                                            <p className="speaker-role">{title}</p>
+                                            <p className="speaker-name">{name}</p>
+                                        </div>
+                                    </div>
+                                </article>
+                            </Reveal>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
             {/* ===== EVENT DETAILS ===== */}
             <section className="relative px-6 py-16 text-white">
                 {/* Fixed parallax background */}
@@ -316,9 +415,9 @@ export default function HomePage() {
                 <div className="absolute inset-0 bg-black/90" />
 
                 <div className="relative z-10 max-w-sm mx-auto w-full">
-                    <h2 className="text-2xl md:text-3xl font-black text-center mb-8">
-                        موعد الورشة
-                    </h2>
+                    <SectionTitle className="text-white" wrapClassName="mb-8">
+                        موعد المبادرة
+                    </SectionTitle>
 
                     <ul className="space-y-4 mb-10">
                         <li className="flex items-center gap-4 bg-white/5 px-4 py-4">
@@ -359,9 +458,9 @@ export default function HomePage() {
             {/* ===== ORGANIZERS + SPONSOR ===== */}
             <section className="px-6 py-12 md:py-14 bg-[#faf8f4] border-t border-[#1a2332]/08">
                 <div className="max-w-md mx-auto text-center">
-                    <h2 className="text-2xl md:text-3xl font-black text-[#1a2332] mb-6">
+                    <SectionTitle wrapClassName="mb-6">
                         التنظيم والرعاة
-                    </h2>
+                    </SectionTitle>
 
                     <p className="inline-flex items-center justify-center gap-2 text-[#5a6578] text-sm font-bold mb-5">
                         <IconUsers className="w-5 h-5 text-[#1a6b4a]" />
@@ -393,7 +492,7 @@ export default function HomePage() {
 
                     <p className="inline-flex items-center justify-center gap-2 text-[#5a6578] text-sm font-bold mb-2">
                         <IconFlower className="w-5 h-5 text-[#1a6b4a]" />
-                        تُقام الورشة صدقة جارية على
+                        تُقام المبادرة صدقة جارية على
                     </p>
                     <p className="text-xl font-bold text-[#1a2332] leading-relaxed">
                         الأستاذ / السيد عبدالمنعم هيكل

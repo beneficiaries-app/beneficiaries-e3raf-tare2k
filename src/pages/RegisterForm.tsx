@@ -35,18 +35,26 @@ export default function RegisterForm() {
         }
 
         const form = e.currentTarget
-        const data = new FormData(form)
-        data.set("role", role)
+        const name = (form.elements.namedItem("name") as HTMLInputElement).value.trim()
+        const expectation = (form.elements.namedItem("expectation") as HTMLTextAreaElement).value.trim()
 
         setIsSubmitting(true)
         setError("")
 
+        const body = new URLSearchParams({
+            name,
+            role,
+            expectation,
+        })
+
         try {
-            // Google Apps Script يعيد توجيهًا، لذلك نستخدم no-cors
             await fetch(SCRIPT_URL, {
                 method: "POST",
                 mode: "no-cors",
-                body: data,
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: body.toString(),
             })
             navigate("/submission")
         } catch {
@@ -78,8 +86,11 @@ export default function RegisterForm() {
                         </div>
                     </div>
 
+                    <p className="text-[#c4a035] text-sm font-bold tracking-[0.25em] mb-3">
+                        مبادرة
+                    </p>
                     <h1 className="text-3xl md:text-4xl font-black mb-2">اعرف طريقك</h1>
-                    <p className="text-[#c4a035] text-sm font-bold tracking-[0.15em] mb-4">
+                    <p className="text-white/60 text-sm font-bold mb-4">
                         تسجيل الحضور
                     </p>
                     <Link
