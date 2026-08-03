@@ -146,7 +146,8 @@ export default function RegisterForm() {
 
                     <div>
                         <label htmlFor="expectation" className={labelClass}>
-                            متوقع إيه من المبادرة؟ <span className="text-[#c4a035]">*</span>
+                            متوقع إيه من المبادرة؟{" "}
+                            <span className="text-white/40 font-normal">(اختياري)</span>
                         </label>
                         <textarea
                             className={`${inputClass} resize-none`}
@@ -154,7 +155,6 @@ export default function RegisterForm() {
                             id="expectation"
                             placeholder="اكتب توقعاتك من المبادرة"
                             rows={4}
-                            required
                         />
                     </div>
 

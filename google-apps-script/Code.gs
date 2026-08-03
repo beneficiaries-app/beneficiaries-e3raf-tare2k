@@ -36,7 +36,7 @@ function doPost(e) {
     var role = String(data.role || '').trim();
     var expectation = String(data.expectation || '').trim();
 
-    if (!name || !role || !expectation) {
+    if (!name || !role) {
       return json_({ ok: false, error: 'missing_required_fields', received: data });
     }
 
