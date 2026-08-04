@@ -24,7 +24,7 @@
 var SPREADSHEET_ID = '1V7qyTDFW3vYptTZ6NPetPtM531RhdKXkpqLi0ZEf0T0';
 
 // ←←← مفتاح سري لصفحة الأدمن (غيّره قبل الـ Deploy)
-var ADMIN_LIST_KEY = 'nadwa-admin-2026';
+var ADMIN_LIST_KEY = '082026';
 
 var SHEET_NAME = 'التسجيلات';
 var HEADERS = ['الوقت', 'الاسم', 'الفئة', 'متوقع من المبادرة'];
