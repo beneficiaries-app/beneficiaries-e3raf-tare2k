@@ -74,6 +74,8 @@ export default function AdminDashboard() {
     const [search, setSearch] = useState("")
     const [roleFilter, setRoleFilter] = useState("الكل")
     const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
+    const [viewMode, setViewMode] = useState<"table" | "expectations">("table")
+    const [selected, setSelected] = useState<Registration | null>(null)
 
     const load = async (key: string) => {
         if (!SCRIPT_URL) {
@@ -166,8 +168,18 @@ export default function AdminDashboard() {
         for (const r of rows) {
             byRole[r.role] = (byRole[r.role] || 0) + 1
         }
-        return { total: rows.length, byRole }
+        const withExpectation = rows.filter((r) => r.expectation.trim()).length
+        return { total: rows.length, byRole, withExpectation }
     }, [rows])
+
+    useEffect(() => {
+        if (!selected) return
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === "Escape") setSelected(null)
+        }
+        window.addEventListener("keydown", onKey)
+        return () => window.removeEventListener("keydown", onKey)
+    }, [selected])
 
     if (!adminKey) {
         return (
@@ -258,14 +270,17 @@ export default function AdminDashboard() {
                         )}
 
                         {/* Stats: total + each role */}
-                        <section className="grid grid-cols-2 gap-2.5 sm:grid-cols-4 sm:gap-3">
+                        <section className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5 sm:gap-3">
                             <KpiCard
                                 label="الإجمالي"
                                 value={stats.total}
                                 icon={<IconUsers className="h-4 w-4" />}
                                 accent="emerald"
-                                active={roleFilter === "الكل"}
-                                onClick={() => setRoleFilter("الكل")}
+                                active={roleFilter === "الكل" && viewMode === "table"}
+                                onClick={() => {
+                                    setRoleFilter("الكل")
+                                    setViewMode("table")
+                                }}
                             />
                             {ROLES.map((role) => (
                                 <KpiCard
@@ -280,15 +295,49 @@ export default function AdminDashboard() {
                                     onClick={() => setRoleFilter(roleFilter === role ? "الكل" : role)}
                                 />
                             ))}
+                            <KpiCard
+                                label="التوقعات"
+                                value={stats.withExpectation}
+                                icon={<IconQuote className="h-4 w-4" />}
+                                accent="slate"
+                                active={viewMode === "expectations"}
+                                onClick={() => setViewMode(viewMode === "expectations" ? "table" : "expectations")}
+                            />
                         </section>
 
-                        {/* Table */}
+                        {/* Table / Expectations */}
                         <section className="admin-panel overflow-hidden">
                             <div className="flex flex-col gap-4 border-b border-slate-100 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
                                 <div>
-                                    <h2 className="font-bold text-slate-900">قائمة التسجيلات</h2>
+                                    <div className="mb-2 flex flex-wrap gap-1.5">
+                                        <button
+                                            type="button"
+                                            onClick={() => setViewMode("table")}
+                                            className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+                                                viewMode === "table"
+                                                    ? "bg-[#1a6b4a] text-white"
+                                                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                            }`}
+                                        >
+                                            قائمة التسجيلات
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setViewMode("expectations")}
+                                            className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+                                                viewMode === "expectations"
+                                                    ? "bg-[#1a6b4a] text-white"
+                                                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                            }`}
+                                        >
+                                            كل التوقعات
+                                        </button>
+                                    </div>
                                     <p className="text-xs text-slate-400">
                                         {filtered.length} نتيجة من {rows.length}
+                                        {viewMode === "expectations"
+                                            ? ` · ${filtered.filter((r) => r.expectation.trim()).length} توقع`
+                                            : ""}
                                     </p>
                                 </div>
                                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -298,7 +347,11 @@ export default function AdminDashboard() {
                                             type="search"
                                             value={search}
                                             onChange={(e) => setSearch(e.target.value)}
-                                            placeholder="بحث…"
+                                            placeholder={
+                                                viewMode === "expectations"
+                                                    ? "بحث في التوقعات…"
+                                                    : "بحث…"
+                                            }
                                             className="admin-input !py-2 pe-3 ps-9 sm:w-52"
                                         />
                                     </div>
@@ -317,77 +370,196 @@ export default function AdminDashboard() {
                                 </div>
                             </div>
 
-                            <div className="overflow-x-auto">
-                                <table className="admin-table w-full min-w-[720px] text-right">
-                                    <thead>
-                                        <tr>
-                                            <th className="w-14">#</th>
-                                            <th>المشارك</th>
-                                            <th>الفئة</th>
-                                            <th>متوقع من المبادرة</th>
-                                            <th className="w-40">وقت التسجيل</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {loading && rows.length === 0 ? (
+                            {viewMode === "table" ? (
+                                <div className="overflow-x-auto">
+                                    <table className="admin-table w-full min-w-[720px] text-right">
+                                        <thead>
                                             <tr>
-                                                <td colSpan={5} className="!py-16 text-center text-slate-400">
-                                                    <div className="mx-auto mb-3 h-7 w-7 animate-spin rounded-full border-2 border-slate-200 border-t-[#1a6b4a]" />
-                                                    جاري التحميل…
-                                                </td>
+                                                <th className="w-14">#</th>
+                                                <th>المشارك</th>
+                                                <th>الفئة</th>
+                                                <th>متوقع من المبادرة</th>
+                                                <th className="w-40">وقت التسجيل</th>
                                             </tr>
-                                        ) : filtered.length === 0 ? (
-                                            <tr>
-                                                <td colSpan={5} className="!py-16 text-center text-slate-400">
-                                                    لا توجد نتائج
-                                                </td>
-                                            </tr>
-                                        ) : (
-                                            filtered.map((r, idx) => (
-                                                <tr key={`${r.id}-${r.timestamp}-${r.name}`}>
-                                                    <td className="tabular-nums text-slate-400">
-                                                        {filtered.length - idx}
+                                        </thead>
+                                        <tbody>
+                                            {loading && rows.length === 0 ? (
+                                                <tr>
+                                                    <td colSpan={5} className="!py-16 text-center text-slate-400">
+                                                        <div className="mx-auto mb-3 h-7 w-7 animate-spin rounded-full border-2 border-slate-200 border-t-[#1a6b4a]" />
+                                                        جاري التحميل…
                                                     </td>
-                                                    <td>
-                                                        <div className="flex items-center gap-3">
+                                                </tr>
+                                            ) : filtered.length === 0 ? (
+                                                <tr>
+                                                    <td colSpan={5} className="!py-16 text-center text-slate-400">
+                                                        لا توجد نتائج
+                                                    </td>
+                                                </tr>
+                                            ) : (
+                                                filtered.map((r, idx) => (
+                                                    <tr
+                                                        key={`${r.id}-${r.timestamp}-${r.name}`}
+                                                        className="cursor-pointer"
+                                                        onClick={() => setSelected(r)}
+                                                    >
+                                                        <td className="tabular-nums text-slate-400">
+                                                            {filtered.length - idx}
+                                                        </td>
+                                                        <td>
+                                                            <div className="flex items-center gap-3">
+                                                                <span
+                                                                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
+                                                                    style={{
+                                                                        background:
+                                                                            ROLE_COLORS[r.role] || "#64748b",
+                                                                    }}
+                                                                >
+                                                                    {initialOf(r.name)}
+                                                                </span>
+                                                                <span className="font-semibold text-slate-800">
+                                                                    {r.name}
+                                                                </span>
+                                                            </div>
+                                                        </td>
+                                                        <td>
                                                             <span
-                                                                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
-                                                                style={{
-                                                                    background:
-                                                                        ROLE_COLORS[r.role] || "#64748b",
-                                                                }}
+                                                                className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ${rolePill(r.role)}`}
                                                             >
-                                                                {initialOf(r.name)}
+                                                                {r.role || "—"}
                                                             </span>
+                                                        </td>
+                                                        <td className="max-w-sm text-sm leading-relaxed text-slate-500">
+                                                            <span className="line-clamp-2">
+                                                                {r.expectation || "—"}
+                                                            </span>
+                                                            {r.expectation.trim().length > 80 && (
+                                                                <span className="mt-1 block text-xs font-semibold text-[#1a6b4a]">
+                                                                    عرض الكامل
+                                                                </span>
+                                                            )}
+                                                        </td>
+                                                        <td className="whitespace-nowrap text-sm tabular-nums text-slate-500">
+                                                            {formatShortDate(r.timestamp)}
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            ) : (
+                                <div className="divide-y divide-slate-100">
+                                    {loading && rows.length === 0 ? (
+                                        <div className="px-4 py-16 text-center text-slate-400 sm:px-5">
+                                            <div className="mx-auto mb-3 h-7 w-7 animate-spin rounded-full border-2 border-slate-200 border-t-[#1a6b4a]" />
+                                            جاري التحميل…
+                                        </div>
+                                    ) : filtered.filter((r) => r.expectation.trim()).length === 0 ? (
+                                        <div className="px-4 py-16 text-center text-slate-400 sm:px-5">
+                                            لا توجد توقعات
+                                        </div>
+                                    ) : (
+                                        filtered
+                                            .filter((r) => r.expectation.trim())
+                                            .map((r) => (
+                                                <button
+                                                    key={`${r.id}-${r.timestamp}-${r.name}-exp`}
+                                                    type="button"
+                                                    onClick={() => setSelected(r)}
+                                                    className="flex w-full flex-col gap-3 px-4 py-4 text-start transition hover:bg-slate-50 sm:flex-row sm:items-start sm:gap-4 sm:px-5"
+                                                >
+                                                    <span
+                                                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
+                                                        style={{
+                                                            background: ROLE_COLORS[r.role] || "#64748b",
+                                                        }}
+                                                    >
+                                                        {initialOf(r.name)}
+                                                    </span>
+                                                    <div className="min-w-0 flex-1">
+                                                        <div className="mb-1.5 flex flex-wrap items-center gap-2">
                                                             <span className="font-semibold text-slate-800">
                                                                 {r.name}
                                                             </span>
+                                                            <span
+                                                                className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ${rolePill(r.role)}`}
+                                                            >
+                                                                {r.role || "—"}
+                                                            </span>
+                                                            <span className="text-xs tabular-nums text-slate-400">
+                                                                {formatShortDate(r.timestamp)}
+                                                            </span>
                                                         </div>
-                                                    </td>
-                                                    <td>
-                                                        <span
-                                                            className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ${rolePill(r.role)}`}
-                                                        >
-                                                            {r.role || "—"}
-                                                        </span>
-                                                    </td>
-                                                    <td className="max-w-sm text-sm leading-relaxed text-slate-500">
-                                                        <span className="line-clamp-2">
-                                                            {r.expectation || "—"}
-                                                        </span>
-                                                    </td>
-                                                    <td className="whitespace-nowrap text-sm tabular-nums text-slate-500">
-                                                        {formatShortDate(r.timestamp)}
-                                                    </td>
-                                                </tr>
+                                                        <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-600">
+                                                            {r.expectation}
+                                                        </p>
+                                                    </div>
+                                                </button>
                                             ))
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
+                                    )}
+                                </div>
+                            )}
                         </section>
                     </main>
             </div>
+
+            {selected && (
+                <div
+                    className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 p-4 sm:items-center"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="expectation-dialog-title"
+                    onClick={() => setSelected(null)}
+                >
+                    <div
+                        className="admin-panel max-h-[85svh] w-full max-w-lg overflow-y-auto p-5 sm:p-6"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="mb-5 flex items-start justify-between gap-3">
+                            <div className="flex items-center gap-3">
+                                <span
+                                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-base font-bold text-white"
+                                    style={{ background: ROLE_COLORS[selected.role] || "#64748b" }}
+                                >
+                                    {initialOf(selected.name)}
+                                </span>
+                                <div>
+                                    <h2
+                                        id="expectation-dialog-title"
+                                        className="text-lg font-bold text-slate-900"
+                                    >
+                                        {selected.name}
+                                    </h2>
+                                    <div className="mt-1 flex flex-wrap items-center gap-2">
+                                        <span
+                                            className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ${rolePill(selected.role)}`}
+                                        >
+                                            {selected.role || "—"}
+                                        </span>
+                                        <span className="text-xs text-slate-400">
+                                            {formatDate(selected.timestamp)}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setSelected(null)}
+                                className="admin-btn-ghost !px-2 !py-1 text-lg leading-none"
+                                aria-label="إغلاق"
+                            >
+                                ×
+                            </button>
+                        </div>
+
+                        <p className="mb-2 text-xs font-semibold text-slate-400">متوقع من المبادرة</p>
+                        <p className="whitespace-pre-wrap text-base leading-relaxed text-slate-700">
+                            {selected.expectation.trim() || "—"}
+                        </p>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
@@ -475,6 +647,14 @@ function IconSearch(props: SVGProps<SVGSVGElement>) {
         <IconBase {...props}>
             <circle cx="11" cy="11" r="7" />
             <path d="m20 20-3.5-3.5" />
+        </IconBase>
+    )
+}
+
+function IconQuote(props: SVGProps<SVGSVGElement>) {
+    return (
+        <IconBase {...props}>
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
         </IconBase>
     )
 }
